@@ -58,7 +58,7 @@ public class App {
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", StringDeserializer.class);
         kafkaParams.put("group.id", groupId);
-        kafkaParams.put("auto.offset.reset", "latest"); //change to latest
+        kafkaParams.put("auto.offset.reset", "earliest"); //change to latest
         kafkaParams.put("enable.auto.commit", false);
 
         // Create direct kafka stream with brokers and topics
@@ -84,26 +84,26 @@ public class App {
                 JavaRDD<Tweet> rowRDD = tweetRDD.map(new Function<String, Tweet>() {
 
                     @Override
-                    public Tweet call(String tweetStr) throws Exception {
+                    public Tweet call(String tweetJson) throws Exception {
                         Gson gson = new Gson();
-                        Tweet tweet = gson.fromJson(tweetStr, Tweet.class);
+                        Tweet tweet = gson.fromJson(tweetJson, Tweet.class);
                         String sentiment = "";
                         if (tweet.getLang().equals("en")) {
                             sentiment = String.valueOf(SentimentUtils.calculateWeightedSentimentScore(tweet.getText()));
                         }
                         System.out.println("-------Sentiment-----------" + sentiment);
-                        tweet.setSentimate(sentiment);
+                        tweet.setSentiment(sentiment);
                         return tweet;
                     }
                 });
                 Dataset<Row> wordsDataFrame = session.createDataFrame(rowRDD, Tweet.class);
                 //wordsDataFrame.createOrReplaceTempView("twitter");
                 wordsDataFrame.write().mode(SaveMode.Append).saveAsTable("twitter");
-                session.sql("select * from twitter").show();
+                session.sql("select * from twitter").show(); // 20 rows
 
                 //persist data into cassandra
                 javaFunctions(rowRDD).writerBuilder(
-                        "gis", "tweet", mapToRow(Tweet.class)).saveToCassandra();
+                        "gis", "tweetlive", mapToRow(Tweet.class)).saveToCassandra();
 
             }
 

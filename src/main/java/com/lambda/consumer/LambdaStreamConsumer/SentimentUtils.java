@@ -117,19 +117,19 @@ public class SentimentUtils {
     }
 
     public static void main(String[] args) {
-        int a = calculateWeightedSentimentScore("awesome happy");
+        int a = calculateWeightedSentimentScore("awesome happy"); //3
         System.out.println(a);
 
-        int b = calculateWeightedSentimentScore("I am happy");
+        int b = calculateWeightedSentimentScore("I am happy"); // 3
         System.out.println(b);
 
-        int c = calculateWeightedSentimentScore("I am sad");
+        int c = calculateWeightedSentimentScore("I am sad");//2
         System.out.println(c);
 
-        int d = calculateWeightedSentimentScore("I am very sad");
+        int d = calculateWeightedSentimentScore("I am very sad"); //1
         System.out.println(d);
 
-        int e = calculateWeightedSentimentScore("I am sad and frustrated");
+        int e = calculateWeightedSentimentScore("I am sad and frustrated");//1
         System.out.println(e);
     }
 }
