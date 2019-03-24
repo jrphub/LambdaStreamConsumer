@@ -31,7 +31,7 @@ public class App {
     //default values
     private static String brokers = "localhost:9092";
     private static String groupId = "tweets-stream-demo";
-    private static String topic = "tweets-ml-raw";
+    private static String topic = "tweets";
 
     public static void main(String[] args) {
         if (args.length == 3) {
@@ -89,13 +89,19 @@ public class App {
                             tweet.setFulltext(tweet.getText());
                         }
 
-                        String[] locationArr = tweet.getUser().getLocation().split(",");
-                        if (!StringUtils.isEmpty(locationArr[0])) {
-                            tweet.setLocation(locationArr[0]);
-                        }
+                        if (tweet.getUser() != null && tweet.getUser().getLocation() != null) {
+                            String[] locationArr = tweet.getUser().getLocation().split(",");
+                            if (locationArr.length > 0 && !StringUtils.isEmpty(locationArr[0])) {
+                                tweet.setLocation(locationArr[0]);
+                            }
 
-                        if (!StringUtils.isEmpty(locationArr[1])) {
-                            tweet.setCountry(locationArr[1].trim());
+                            if (locationArr.length > 1 && !StringUtils.isEmpty(locationArr[1].trim())) {
+                                tweet.setCountry(locationArr[1].trim());
+                            } else {
+                                tweet.setCountry(locationArr[0].trim());
+                            }
+                        } else {
+                            tweet.setCountry("out_of_world");
                         }
 
                         String sentiment = "";
