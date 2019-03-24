@@ -1,26 +1,22 @@
 package com.lambda.consumer.LambdaStreamConsumer;
 
 import com.google.gson.Gson;
+import com.lambda.consumer.beans.Tweet;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.ml.classification.LogisticRegression;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka010.*;
-import scala.Tuple2;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
+import org.datanucleus.util.StringUtils;
 
 import java.util.*;
 
@@ -34,8 +30,8 @@ public class App {
 
     //default values
     private static String brokers = "localhost:9092";
-    private static String groupId = "tweets-ml-demo";
-    private static String topic = "tweets-ml-raw";
+    private static String groupId = "tweets-group";
+    private static String topic = "tweets";
 
     public static void main(String[] args) {
         if (args.length == 3) {
@@ -87,27 +83,40 @@ public class App {
                     public Tweet call(String tweetJson) throws Exception {
                         Gson gson = new Gson();
                         Tweet tweet = gson.fromJson(tweetJson, Tweet.class);
+                        if (tweet.getRetweeted_status() != null && tweet.getRetweeted_status().getExtended_tweet() != null) {
+                            tweet.setFulltext(tweet.getRetweeted_status().getExtended_tweet().getFull_text());
+                        } else {
+                            tweet.setFulltext(tweet.getText());
+                        }
+
+                        String[] locationArr = tweet.getUser().getLocation().split(",");
+                        if (!StringUtils.isEmpty(locationArr[0])) {
+                            tweet.setLocation(locationArr[0]);
+                        }
+
+                        if (!StringUtils.isEmpty(locationArr[1])) {
+                            tweet.setCountry(locationArr[1].trim());
+                        }
+
                         String sentiment = "";
                         if (tweet.getLang().equals("en")) {
-                            sentiment = String.valueOf(SentimentUtils.calculateWeightedSentimentScore(tweet.getText()));
+                            sentiment = String.valueOf(SentimentUtils.calculateWeightedSentimentScore(tweet.getFulltext()));
                         }
                         System.out.println("-------Sentiment-----------" + sentiment);
                         tweet.setSentiment(sentiment);
                         return tweet;
                     }
                 });
-                Dataset<Row> wordsDataFrame = session.createDataFrame(rowRDD, Tweet.class);
+                /*Dataset<Row> wordsDataFrame = session.createDataFrame(rowRDD, Tweet.class);
                 //wordsDataFrame.createOrReplaceTempView("twitter");
                 wordsDataFrame.write().mode(SaveMode.Append).saveAsTable("twitter");
-                session.sql("select * from twitter").show(); // 20 rows
+                session.sql("select * from twitter").show(); */// 20 rows
 
                 //persist data into cassandra
                 javaFunctions(rowRDD).writerBuilder(
-                        "gis", "tweetlive", mapToRow(Tweet.class)).saveToCassandra();
+                        "gis", "tweets", mapToRow(Tweet.class)).saveToCassandra();
 
             }
-
-
         });
 
         jssc.start();

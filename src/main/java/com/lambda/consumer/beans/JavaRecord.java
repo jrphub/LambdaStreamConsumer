@@ -1,4 +1,4 @@
-package com.lambda.consumer.LambdaStreamConsumer;
+package com.lambda.consumer.beans;
 
 import java.io.Serializable;
 

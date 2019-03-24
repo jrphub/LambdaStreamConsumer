@@ -1,7 +1,8 @@
-package com.lambda.consumer.LambdaStreamConsumer;
+package com.lambda.consumer.beans;
 
 import java.io.Serializable;
 
+import com.datastax.driver.mapping.annotations.Transient;
 import com.google.gson.annotations.SerializedName;
 
 public class Tweet implements Serializable {
@@ -18,17 +19,21 @@ public class Tweet implements Serializable {
     @SerializedName("source")
     private String source;
 	
-	/*@SerializedName("coordinates")
-	private String coordinates;*/
-
     @SerializedName("lang")
     private String lang;
 
     private String sentiment;
 
-    //private TweetUser user;
+    @Transient
+    private TweetUser user;
 
-    //private String extendedText;
+    @Transient
+    private RetweetedStatus retweeted_status;
+
+    private String fulltext;
+    private String location;
+    private String country;
+
 
     public String getCreatedat() {
         return createdat;
@@ -54,12 +59,6 @@ public class Tweet implements Serializable {
         this.source = source;
     }
 
-    /*public String getCoordinates() {
-        return coordinates;
-    }
-    public void setCoordinates(String coordinates) {
-        this.coordinates = coordinates;
-    }*/
     public String getLang() {
         return lang;
     }
@@ -67,12 +66,6 @@ public class Tweet implements Serializable {
     public void setLang(String lang) {
         this.lang = lang;
     }
-	/*public TweetUser getUser() {
-		return user;
-	}
-	public void setUser(TweetUser user) {
-		this.user = user;
-	}*/
 
     public String getId() {
         return id;
@@ -88,5 +81,49 @@ public class Tweet implements Serializable {
 
     public void setSentiment(String sentiment) {
         this.sentiment = sentiment;
+    }
+
+    public TweetUser getUser() {
+        return user;
+    }
+
+    public void setUser(TweetUser user) {
+        this.user = user;
+    }
+
+    public RetweetedStatus getRetweeted_status() {
+        return retweeted_status;
+    }
+
+    public void setRetweeted_status(RetweetedStatus retweeted_status) {
+        this.retweeted_status = retweeted_status;
+    }
+
+    public String getFulltext() {
+        return fulltext;
+    }
+
+    public void setFulltext(String fulltext) {
+        this.fulltext = fulltext;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String toString() {
+        return "From : " + getLocation() + ", " + getCountry() + "\nTweet : " + getFulltext();
     }
 }

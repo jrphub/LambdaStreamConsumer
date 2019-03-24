@@ -1,4 +1,4 @@
-package com.lambda.consumer.LambdaStreamConsumer;
+package com.lambda.consumer.beans;
 
 import java.io.Serializable;
 
@@ -9,18 +9,18 @@ public class ExtendedTweet implements Serializable {
 	private static final long serialVersionUID = -4700747380480002734L;
 	
 	@SerializedName("full_text")
-	private String fullText;
+	private String full_text;
 
-	public String getFullText() {
-		return fullText;
+	public String getFull_text() {
+		return full_text;
 	}
 
-	public void setFullText(String fullText) {
-		this.fullText = fullText;
+	public void setFull_text(String full_text) {
+		this.full_text = full_text;
 	}
 
 	@Override
 	public String toString() {
-		return getFullText();
+		return getFull_text();
 	}
 }
