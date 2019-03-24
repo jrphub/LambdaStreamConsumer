@@ -30,8 +30,8 @@ public class App {
 
     //default values
     private static String brokers = "localhost:9092";
-    private static String groupId = "tweets-group";
-    private static String topic = "tweets";
+    private static String groupId = "tweets-stream-demo";
+    private static String topic = "tweets-ml-raw";
 
     public static void main(String[] args) {
         if (args.length == 3) {
