@@ -104,9 +104,9 @@ public class App {
                             tweet.setCountry("out_of_world");
                         }
 
-                        String sentiment = "";
+                        int sentiment = -999;
                         if (tweet.getLang().equals("en")) {
-                            sentiment = String.valueOf(SentimentUtils.calculateWeightedSentimentScore(tweet.getFulltext()));
+                            sentiment = SentimentUtils.calculateWeightedSentimentScore(tweet.getFulltext());
                         }
                         System.out.println("-------Sentiment-----------" + sentiment);
                         tweet.setSentiment(sentiment);

@@ -22,7 +22,7 @@ public class Tweet implements Serializable {
     @SerializedName("lang")
     private String lang;
 
-    private String sentiment;
+    private int sentiment;
 
     @Transient
     private TweetUser user;
@@ -75,11 +75,11 @@ public class Tweet implements Serializable {
         this.id = id;
     }
 
-    public String getSentiment() {
+    public int getSentiment() {
         return sentiment;
     }
 
-    public void setSentiment(String sentiment) {
+    public void setSentiment(int sentiment) {
         this.sentiment = sentiment;
     }
 
